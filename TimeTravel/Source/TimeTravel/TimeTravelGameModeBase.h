@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "TimeSystem/TimeSystem.h"
 #include "TimeTravelGameModeBase.generated.h"
 
 /**
@@ -14,4 +15,8 @@ class TIMETRAVEL_API ATimeTravelGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	ATimeTravelGameModeBase();
+	void Tick(float DeltaTime) override;
+	TimeSystem TimeSystemInstance;
 };
