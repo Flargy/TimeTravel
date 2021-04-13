@@ -1,6 +1,7 @@
 #include "TimeSystem.h"
 #include "TimeComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "PhysicsEngine/PhysicsSettings.h"
 
 void TimeSystem::RegisterTimeComponent(UTimeComponent* compToAdd)
 {
@@ -16,6 +17,9 @@ void TimeSystem::UnregisterTimeComponent(UTimeComponent* compToRemove)
 void TimeSystem::BeginRewind()
 {
 	IsRewinding = true;
+
+	
+	
 	
 	for (UTimeComponent* comp : ReverseComponents)
 	{
@@ -26,6 +30,9 @@ void TimeSystem::BeginRewind()
 void TimeSystem::EndRewind()
 {
 	IsRewinding = false;
+
+	
+
 
 	for (UTimeComponent* comp : ReverseComponents)
 	{
