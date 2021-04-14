@@ -18,17 +18,8 @@ void UTimeComponent::BeginPlay()
 	if (GameMode)
 		GameMode->TimeSystemInstance.RegisterTimeComponent(this);
 
-	PhysicsComponents.Empty();
-
-	TArray<UActorComponent*> ActorComponents = OwningActor->K2_GetComponentsByClass(UPrimitiveComponent::StaticClass());
-
-	for (UActorComponent* Component : ActorComponents)
-	{
-		UPrimitiveComponent* Primitive = Cast<UPrimitiveComponent>(Component);
-		PhysicsComponents.Add(Primitive);
-	}
-
-
+	PhysicsComponent = Cast<UPrimitiveComponent>(OwningActor->GetRootComponent());
+	
 }
 
 
@@ -43,6 +34,7 @@ void UTimeComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FA
 	FrameData.Rotation = OwnerTransform.GetRotation();
 	FrameData.Velocity = OwningActor->GetVelocity();
 	FrameData.DeltaTime = DeltaTime;
+	FrameData.AngularVelocity = PhysicsComponent->GetPhysicsAngularVelocityInRadians();
 
 	SavedData.Add(FrameData);
 
@@ -60,11 +52,8 @@ void UTimeComponent::BeginReverse()
 {
 	OwningActor->SetActorTickEnabled(false);
 	SetComponentTickEnabled(false);
-	for (UPrimitiveComponent* PrimitiveComp : PhysicsComponents)
-	{
-		PrimitiveComp->SetSimulatePhysics(false);
-	}
-
+	PhysicsComponent->SetSimulatePhysics(false);
+	
 	CurrentRewindFrame = SavedData.Num() - 1;
 	TimeInCurrentRewindFrame = 0;
 }
@@ -73,11 +62,11 @@ void UTimeComponent::EndReverse()
 {
 	OwningActor->SetActorTickEnabled(true);
 	SetComponentTickEnabled(true);
-	for (UPrimitiveComponent* PrimitiveComp : PhysicsComponents)
-	{
-		PrimitiveComp->SetSimulatePhysics(true);
-		PrimitiveComp->SetPhysicsLinearVelocity(SavedVelocity);
-	}
+	
+	PhysicsComponent->SetSimulatePhysics(true);
+	PhysicsComponent->SetPhysicsLinearVelocity(SavedVelocity);
+	PhysicsComponent->SetPhysicsAngularVelocityInRadians(SavedAngularVelocity);
+	
 
 	SavedData.RemoveAt(CurrentRewindFrame, SavedData.Num() - CurrentRewindFrame);
 
@@ -100,7 +89,6 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 	float LerpT = TimeInCurrentRewindFrame / SavedData[CurrentRewindFrame + 1].DeltaTime;
 
 
-
 	FTimeData CurrentFrameData = SavedData[CurrentRewindFrame];
 	FTimeData PreviousFrameData = SavedData[CurrentRewindFrame + 1];
 
@@ -113,6 +101,8 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 	OwningActor->SetActorRotation(NewQuat);
 
 	SavedVelocity = FMath::Lerp(CurrentFrameData.Velocity, PreviousFrameData.Velocity, LerpT);
+
+	SavedAngularVelocity = FMath::Lerp(CurrentFrameData.AngularVelocity, PreviousFrameData.AngularVelocity, LerpT);
 
 	UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f Z: %f"), NewPosition.X, NewPosition.Y, NewPosition.Z);
 }

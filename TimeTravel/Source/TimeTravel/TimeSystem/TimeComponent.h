@@ -23,7 +23,7 @@ private:
 	AActor* OwningActor;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<UPrimitiveComponent*> PhysicsComponents;
+	UPrimitiveComponent* PhysicsComponent;
 
 	UPROPERTY(EditAnywhere)
 	float SecondsToRewind = 5.f;
@@ -36,6 +36,7 @@ private:
 	float TimeInCurrentRewindFrame = 0.0f;
 
 	FVector SavedVelocity;
+	FVector SavedAngularVelocity;
 
 	TArray<FTimeData> SavedData;
 };

@@ -13,4 +13,5 @@ struct FTimeData
 	UPROPERTY(EditInstanceOnly)
 	FQuat Rotation;
 	float DeltaTime;
+	FVector AngularVelocity;
 };
