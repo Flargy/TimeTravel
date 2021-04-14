@@ -65,10 +65,10 @@ void UTimeComponent::EndReverse()
 {
 	OwningActor->SetActorTickEnabled(true);
 	SetComponentTickEnabled(true);
+	PhysicsComponent->SetSimulatePhysics(true);
 	
 	FTimeData CurrentFrameData = SavedData[CurrentRewindFrame];
 
-	PhysicsComponent->SetSimulatePhysics(true);
 	PhysicsComponent->SetPhysicsLinearVelocity(CurrentFrameData.Velocity);
 	PhysicsComponent->SetPhysicsAngularVelocityInRadians(CurrentFrameData.AngularVelocity);
 	OwningActor->SetActorLocation(CurrentFrameData.Location);
@@ -84,11 +84,10 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 	TimeInCurrentRewindFrame -= DeltaTime;
 	while (TimeInCurrentRewindFrame < 0.0f && CurrentRewindFrame > 0)
 	{
-		TimeInCurrentRewindFrame += SavedData[CurrentRewindFrame].DeltaTime;
-		FramesSincelastCleanup--;
 		SecondSinceLastCleanup -= SavedData[CurrentRewindFrame].DeltaTime;
+		FramesSincelastCleanup--;
+		TimeInCurrentRewindFrame += SavedData[CurrentRewindFrame].DeltaTime;
 		CurrentRewindFrame--;
-
 	}
 
 	TimeInCurrentRewindFrame = TimeInCurrentRewindFrame < 0.f ? 0.f : TimeInCurrentRewindFrame;
