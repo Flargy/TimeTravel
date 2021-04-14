@@ -18,9 +18,9 @@ void TimeSystem::BeginRewind()
 {
 	IsRewinding = true;
 
-	
-	
-	
+	if (TimeRewinded < 0.f)
+		TimeRewinded = 0.f;
+
 	for (UTimeComponent* comp : ReverseComponents)
 	{
 		comp->BeginReverse();
@@ -29,10 +29,9 @@ void TimeSystem::BeginRewind()
 
 void TimeSystem::EndRewind()
 {
+	if (!IsRewinding)
+		return;
 	IsRewinding = false;
-
-	
-
 
 	for (UTimeComponent* comp : ReverseComponents)
 	{
@@ -43,10 +42,25 @@ void TimeSystem::EndRewind()
 void TimeSystem::Tick(float DeltaTime)
 {
 	if (!IsRewinding)
+	{
+		TimeRewinded -= DeltaTime;
 		return;
+	}
+
+	TimeRewinded += DeltaTime;
+	if (TimeRewinded >= SecondsToRewind)
+	{
+		EndRewind();
+		return;
+	}
 
 	for (UTimeComponent* comp : ReverseComponents)
 	{
 		comp->ReverseTick(DeltaTime);
 	}
+}
+
+float TimeSystem::GetSecondsToRewind()
+{
+	return SecondsToRewind;
 }

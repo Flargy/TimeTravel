@@ -26,7 +26,7 @@ private:
 	UPrimitiveComponent* PhysicsComponent;
 
 	UPROPERTY(EditAnywhere)
-	float SecondsToRewind = 5.f;
+	float SecondsToRewind;
 
 	float SecondSinceLastCleanup = 0.f;
 
@@ -35,8 +35,6 @@ private:
 	int CurrentRewindFrame = 0;
 	float TimeInCurrentRewindFrame = 0.0f;
 
-	FVector SavedVelocity;
-	FVector SavedAngularVelocity;
 
 	TArray<FTimeData> SavedData;
 };

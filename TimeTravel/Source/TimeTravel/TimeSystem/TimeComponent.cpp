@@ -16,7 +16,10 @@ void UTimeComponent::BeginPlay()
 	OwningActor = GetOwner();
 	auto GameMode = Cast<ATimeTravelGameModeBase>(UGameplayStatics::GetGameMode(this));
 	if (GameMode)
+	{
 		GameMode->TimeSystemInstance.RegisterTimeComponent(this);
+		SecondsToRewind = GameMode->TimeSystemInstance.GetSecondsToRewind();
+	}
 
 	PhysicsComponent = Cast<UPrimitiveComponent>(OwningActor->GetRootComponent());
 	
@@ -63,9 +66,13 @@ void UTimeComponent::EndReverse()
 	OwningActor->SetActorTickEnabled(true);
 	SetComponentTickEnabled(true);
 	
+	FTimeData CurrentFrameData = SavedData[CurrentRewindFrame];
+
 	PhysicsComponent->SetSimulatePhysics(true);
-	PhysicsComponent->SetPhysicsLinearVelocity(SavedVelocity);
-	PhysicsComponent->SetPhysicsAngularVelocityInRadians(SavedAngularVelocity);
+	PhysicsComponent->SetPhysicsLinearVelocity(CurrentFrameData.Velocity);
+	PhysicsComponent->SetPhysicsAngularVelocityInRadians(CurrentFrameData.AngularVelocity);
+	OwningActor->SetActorLocation(CurrentFrameData.Location);
+	OwningActor->SetActorRotation(CurrentFrameData.Rotation);
 	
 
 	SavedData.RemoveAt(CurrentRewindFrame, SavedData.Num() - CurrentRewindFrame);
@@ -100,10 +107,7 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 	FQuat NewQuat = FQuat::Slerp(CurrentFrameData.Rotation, PreviousFrameData.Rotation, LerpT);
 	OwningActor->SetActorRotation(NewQuat);
 
-	SavedVelocity = FMath::Lerp(CurrentFrameData.Velocity, PreviousFrameData.Velocity, LerpT);
-
-	SavedAngularVelocity = FMath::Lerp(CurrentFrameData.AngularVelocity, PreviousFrameData.AngularVelocity, LerpT);
-
+	
 	UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f Z: %f"), NewPosition.X, NewPosition.Y, NewPosition.Z);
 }
 

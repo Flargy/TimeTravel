@@ -14,8 +14,11 @@ public:
 	void BeginRewind();
 	void EndRewind();
 	void Tick(float DeltaTime);
+	float GetSecondsToRewind();
 
 private:
 	TArray<UTimeComponent*> ReverseComponents;
 	bool IsRewinding = false;
+	float SecondsToRewind = 5.0f;
+	float TimeRewinded = 0.f;
 };
