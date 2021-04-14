@@ -109,6 +109,16 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 
 	// TODO lerp rotation and velocity between SavedData[CurrentRewindFrame] and SavedData[CurrentRewindFrame + 1]
 
+	FQuat NewQuat = FQuat::Slerp(CurrentFrameData.Rotation, PreviousFrameData.Rotation, LerpT);
+	OwningActor->SetActorRotation(NewQuat);
+
+	FVector NewVelocity = FMath::Lerp(CurrentFrameData.Velocity, PreviousFrameData.Velocity, LerpT);
+	UPrimitiveComponent* PrimComp = Cast<UPrimitiveComponent>(OwningActor->GetRootComponent());
+	if (PrimComp)
+	{
+		PrimComp->SetPhysicsLinearVelocity(NewVelocity);
+	}
+
 	UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f Z: %f"), NewPosition.X, NewPosition.Y, NewPosition.Z);
 }
 
