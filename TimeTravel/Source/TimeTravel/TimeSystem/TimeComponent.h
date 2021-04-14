@@ -35,5 +35,7 @@ private:
 	int CurrentRewindFrame = 0;
 	float TimeInCurrentRewindFrame = 0.0f;
 
+	FVector SavedVelocity;
+
 	TArray<FTimeData> SavedData;
 };

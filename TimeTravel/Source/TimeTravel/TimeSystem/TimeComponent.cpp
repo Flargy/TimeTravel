@@ -76,8 +76,8 @@ void UTimeComponent::EndReverse()
 	for (UPrimitiveComponent* PrimitiveComp : PhysicsComponents)
 	{
 		PrimitiveComp->SetSimulatePhysics(true);
+		PrimitiveComp->SetPhysicsLinearVelocity(SavedVelocity);
 	}
-
 
 	SavedData.RemoveAt(CurrentRewindFrame, SavedData.Num() - CurrentRewindFrame);
 
@@ -112,12 +112,7 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 	FQuat NewQuat = FQuat::Slerp(CurrentFrameData.Rotation, PreviousFrameData.Rotation, LerpT);
 	OwningActor->SetActorRotation(NewQuat);
 
-	FVector NewVelocity = FMath::Lerp(CurrentFrameData.Velocity, PreviousFrameData.Velocity, LerpT);
-	UPrimitiveComponent* PrimComp = Cast<UPrimitiveComponent>(OwningActor->GetRootComponent());
-	if (PrimComp)
-	{
-		PrimComp->SetPhysicsLinearVelocity(NewVelocity);
-	}
+	SavedVelocity = FMath::Lerp(CurrentFrameData.Velocity, PreviousFrameData.Velocity, LerpT);
 
 	UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f Z: %f"), NewPosition.X, NewPosition.Y, NewPosition.Z);
 }
