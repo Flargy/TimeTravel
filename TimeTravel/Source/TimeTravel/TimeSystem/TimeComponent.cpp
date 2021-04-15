@@ -39,7 +39,10 @@ void UTimeComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FA
 	FrameData.DeltaTime = DeltaTime;
 	FrameData.AngularVelocity = PhysicsComponent->GetPhysicsAngularVelocityInRadians();
 
+	TestSave.Broadcast(FrameData);
+
 	SavedData.Add(FrameData);
+	SaveData.Broadcast();
 
 	FramesSincelastCleanup++;
 	SecondSinceLastCleanup += DeltaTime;
@@ -101,18 +104,36 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 	FVector NewPosition = FMath::Lerp(CurrentFrameData.Location, PreviousFrameData.Location, LerpT);
 	OwningActor->SetActorLocation(NewPosition);
 
-	// TODO lerp rotation and velocity between SavedData[CurrentRewindFrame] and SavedData[CurrentRewindFrame + 1]
-
 	FQuat NewQuat = FQuat::Slerp(CurrentFrameData.Rotation, PreviousFrameData.Rotation, LerpT);
 	OwningActor->SetActorRotation(NewQuat);
 
+	LoadData.Broadcast(CurrentRewindFrame, LerpT);
 	
-	UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f Z: %f"), NewPosition.X, NewPosition.Y, NewPosition.Z);
+	//UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f Z: %f"), NewPosition.X, NewPosition.Y, NewPosition.Z);
+}
+
+
+void UTimeComponent::SaveFloat(FName VariableName, float Value)
+{
+	SavedData[SavedData.Num() - 1].SaveFLoat(VariableName, Value);
+}
+
+void UTimeComponent::SaveVector(FName VariableName, FVector Value)
+{
+	SavedData[SavedData.Num() - 1].SaveVector(VariableName, Value);
 }
 
 void UTimeComponent::PerformCleanup()
 {
-	SavedData.RemoveAt(0, SavedData.Num() - FramesSincelastCleanup, true);
+	int FramesToRemove = SavedData.Num() - FramesSincelastCleanup;
+	if (FramesToRemove > 0)
+	{
+		CleanupArray.Broadcast(FramesToRemove - 1);
+
+		UE_LOG(LogTemp, Log, TEXT("Array size before removal:  %d"), SavedData.Num());
+		SavedData.RemoveAt(0, FramesToRemove, true);
+		UE_LOG(LogTemp, Log, TEXT("Array size after removal:  %d"), SavedData.Num());
+	}
 	FramesSincelastCleanup = 0;
 	SecondSinceLastCleanup = 0.f;
 }
