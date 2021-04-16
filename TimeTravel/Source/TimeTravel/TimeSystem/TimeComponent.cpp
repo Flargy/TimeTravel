@@ -95,7 +95,7 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 
 	TimeInCurrentRewindFrame = TimeInCurrentRewindFrame < 0.f ? 0.f : TimeInCurrentRewindFrame;
 
-	float LerpT = TimeInCurrentRewindFrame / SavedData[CurrentRewindFrame + 1].DeltaTime;
+	LerpT = TimeInCurrentRewindFrame / SavedData[CurrentRewindFrame + 1].DeltaTime;
 
 
 	FTimeData CurrentFrameData = SavedData[CurrentRewindFrame];
@@ -121,6 +121,18 @@ void UTimeComponent::SaveFloat(FName VariableName, float Value)
 void UTimeComponent::SaveVector(FName VariableName, FVector Value)
 {
 	SavedData[SavedData.Num() - 1].SaveVector(VariableName, Value);
+}
+
+FVector UTimeComponent::LoadSavedVector(FName VariableName, bool Interpolated)
+{
+	FVector ToReturn = SavedData[CurrentRewindFrame].GetSavedVector(VariableName);
+
+	if (Interpolated == true)
+	{
+		ToReturn = FMath::Lerp(ToReturn, SavedData[CurrentRewindFrame + 1].GetSavedVector(VariableName), LerpT);
+	}
+
+	return ToReturn;
 }
 
 void UTimeComponent::PerformCleanup()

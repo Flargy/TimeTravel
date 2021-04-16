@@ -15,7 +15,6 @@ struct FTimeData
 	FQuat Rotation;
 	float DeltaTime;
 	FVector AngularVelocity;
-	TMap<FName, FrameVariable> SavedVariables;
 	// TODO getters and setters
 
 
@@ -26,7 +25,12 @@ struct FTimeData
 
 	void SaveQuat(FName VariableName, FQuat Value);
 
-	FVector GetVector(FName VariableName);
+	FVector GetSavedVector(FName VariableName);
 
-	FQuat GetQuat(FName VariableName);
+	FQuat GetSavedQuat(FName VariableName);
+
+	float GetSavedFloat(FName VariableName);
+
+private:
+	TMap<FName, FrameVariable> SavedVariables;
 };

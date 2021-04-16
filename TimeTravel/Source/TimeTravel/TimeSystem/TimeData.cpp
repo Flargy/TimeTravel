@@ -22,12 +22,17 @@ void FTimeData::SaveQuat(FName VariableName, FQuat Value)
 }
 
 
-FVector FTimeData::GetVector(FName VariableName)
+FVector FTimeData::GetSavedVector(FName VariableName)
 {
 	return SavedVariables[VariableName].SavedVector;
 }
 
-FQuat FTimeData::GetQuat(FName VariableName)
+FQuat FTimeData::GetSavedQuat(FName VariableName)
 {
 	return SavedVariables[VariableName].SavedQuat;
+}
+
+float FTimeData::GetSavedFloat(FName VariableName)
+{
+	return SavedVariables[VariableName].SavedFloat;
 }

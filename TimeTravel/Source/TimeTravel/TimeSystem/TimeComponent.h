@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SaveVector(FName VariableName, FVector Value);
 
+	UFUNCTION(BlueprintCallable)
+	FVector LoadSavedVector(FName VariableName, bool Interpolated);
+
 	//FVector GetSavedVector()
 
 
@@ -69,6 +72,7 @@ private:
 
 	int CurrentRewindFrame = 0;
 	float TimeInCurrentRewindFrame = 0.0f;
+	float LerpT = 0.f;
 
 
 	TArray<FTimeData> SavedData;

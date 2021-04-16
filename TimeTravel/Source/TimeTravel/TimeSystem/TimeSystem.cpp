@@ -5,7 +5,6 @@
 
 void TimeSystem::RegisterTimeComponent(UTimeComponent* compToAdd)
 {
-	UE_LOG(LogTemp, Log, TEXT("Adding thingy"));
 	ReverseComponents.Add(compToAdd);
 }
 
