@@ -147,6 +147,13 @@ FVector UTimeComponent::LoadSavedVector(FName VariableName, bool Interpolated, F
 	return ToReturn;
 }
 
+FQuat UTimeComponent::WrappedLoadSavedQuat(FName VariableName, bool Interpolated, FRotator DefaultReturnValue /*= FRotator::ZeroRotator*/)
+{
+	FQuat QuatFromRotator = DefaultReturnValue.Quaternion();
+
+	return LoadSavedQuat(VariableName, Interpolated, QuatFromRotator);
+}
+
 FQuat UTimeComponent::LoadSavedQuat(FName VariableName, bool Interpolated, FQuat DefaultReturnValue)
 {
 	FQuat ToReturn = SavedData[CurrentRewindFrame].GetSavedQuat(VariableName, DefaultReturnValue);

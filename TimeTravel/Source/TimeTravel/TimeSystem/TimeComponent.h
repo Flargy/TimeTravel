@@ -52,8 +52,10 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2))
 	FVector LoadSavedVector(FName VariableName, bool Interpolated, FVector DefaultReturnValue = FVector::ZeroVector);
 
-	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2))
-	FQuat LoadSavedQuat(FName VariableName, bool Interpolated, FQuat DefaultReturnValue = FQuat(0, 0, 0, 1));
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Load Saved Quat", AdvancedDisplay = 2))
+	FQuat WrappedLoadSavedQuat(FName VariableName, bool Interpolated, FRotator DefaultReturnValue = FRotator::ZeroRotator);
+
+	FQuat LoadSavedQuat(FName VariableName, bool Interpolated, FQuat DefaultReturnValue);
 
 	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2))
 	float LoadSavedFloat(FName VariableName, bool Interpolated, float DefaultReturnValue = 0.0f);
