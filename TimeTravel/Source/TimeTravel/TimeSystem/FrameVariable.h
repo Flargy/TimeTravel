@@ -2,6 +2,7 @@
 
 struct FrameVariable
 {
+	// Savable data types
 	FVector SavedVector;
 	FQuat SavedQuat;
 	float SavedFloat;

@@ -6,10 +6,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSaveData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBeginRewind);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEndRewind, int, FrameIndex);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCleanup, int, FrameIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLoadData, int, FrameIndex, float, LerpValue);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTestSave, FTimeData, FrameData);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UTimeComponent : public UActorComponent
@@ -37,26 +34,41 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FEndRewind EndRewind;
 
-	UPROPERTY(BlueprintAssignable)
-	FCleanup CleanupArray;
-
-	UPROPERTY(BlueprintAssignable)
-	FTestSave TestSave;
-	
-	UFUNCTION(BlueprintCallable)
-	void SaveFloat(FName VariableName, float Value);
-
 	UFUNCTION(BlueprintCallable)
 	void SaveVector(FName VariableName, FVector Value);
 
 	UFUNCTION(BlueprintCallable)
-	FVector LoadSavedVector(FName VariableName, bool Interpolated);
+	void SaveQuat(FName VariableName, FQuat Value);
 
-	//FVector GetSavedVector()
+	UFUNCTION(BlueprintCallable)
+	void SaveFloat(FName VariableName, float Value);
+
+	UFUNCTION(BlueprintCallable)
+	void SaveInt(FName VariableName, int Value);
+
+	UFUNCTION(BlueprintCallable)
+	void SaveBool(FName VariableName, bool Value);
+
+	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2))
+	FVector LoadSavedVector(FName VariableName, bool Interpolated, FVector DefaultReturnValue = FVector::ZeroVector);
+
+	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2))
+	FQuat LoadSavedQuat(FName VariableName, bool Interpolated, FQuat DefaultReturnValue = FQuat(0, 0, 0, 1));
+
+	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2))
+	float LoadSavedFloat(FName VariableName, bool Interpolated, float DefaultReturnValue = 0.0f);
+
+	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2))
+	int LoadSavedInt(FName VariableName, bool Interpolated, int DefaultReturnValue = 0);
+
+	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 1))
+	bool LoadSavedBool(FName VariableName, bool DefaultReturnValue = false);
+
 
 
 private:
 	void PerformCleanup();
+	int GetArrayEndIndex();
 
 	AActor* OwningActor;
 

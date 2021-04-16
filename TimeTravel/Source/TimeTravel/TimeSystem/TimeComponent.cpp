@@ -39,8 +39,6 @@ void UTimeComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FA
 	FrameData.DeltaTime = DeltaTime;
 	FrameData.AngularVelocity = PhysicsComponent->GetPhysicsAngularVelocityInRadians();
 
-	TestSave.Broadcast(FrameData);
-
 	SavedData.Add(FrameData);
 	SaveData.Broadcast();
 
@@ -112,41 +110,95 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 	//UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f Z: %f"), NewPosition.X, NewPosition.Y, NewPosition.Z);
 }
 
+void UTimeComponent::SaveVector(FName VariableName, FVector Value)
+{
+	SavedData[GetArrayEndIndex()].SaveVector(VariableName, Value);
+}
+
+void UTimeComponent::SaveQuat(FName VariableName, FQuat Value)
+{
+	SavedData[GetArrayEndIndex()].SaveQuat(VariableName, Value);
+}
 
 void UTimeComponent::SaveFloat(FName VariableName, float Value)
 {
-	SavedData[SavedData.Num() - 1].SaveFLoat(VariableName, Value);
+	SavedData[GetArrayEndIndex()].SaveFLoat(VariableName, Value);
 }
 
-void UTimeComponent::SaveVector(FName VariableName, FVector Value)
+void UTimeComponent::SaveInt(FName VariableName, int Value)
 {
-	SavedData[SavedData.Num() - 1].SaveVector(VariableName, Value);
+	SavedData[GetArrayEndIndex()].SaveInt(VariableName, Value);
 }
 
-FVector UTimeComponent::LoadSavedVector(FName VariableName, bool Interpolated)
+void UTimeComponent::SaveBool(FName VariableName, bool Value)
 {
-	FVector ToReturn = SavedData[CurrentRewindFrame].GetSavedVector(VariableName);
+	SavedData[GetArrayEndIndex()].SaveBool(VariableName, Value);
+}
 
-	if (Interpolated == true)
+FVector UTimeComponent::LoadSavedVector(FName VariableName, bool Interpolated, FVector DefaultReturnValue)
+{
+	FVector ToReturn = SavedData[CurrentRewindFrame].GetSavedVector(VariableName, DefaultReturnValue);
+
+	if (Interpolated)
 	{
-		ToReturn = FMath::Lerp(ToReturn, SavedData[CurrentRewindFrame + 1].GetSavedVector(VariableName), LerpT);
+		ToReturn = FMath::Lerp(ToReturn, SavedData[CurrentRewindFrame + 1].GetSavedVector(VariableName, DefaultReturnValue), LerpT);
 	}
 
 	return ToReturn;
 }
 
+FQuat UTimeComponent::LoadSavedQuat(FName VariableName, bool Interpolated, FQuat DefaultReturnValue)
+{
+	FQuat ToReturn = SavedData[CurrentRewindFrame].GetSavedQuat(VariableName, DefaultReturnValue);
+
+	if (Interpolated)
+	{
+		ToReturn = FQuat::Slerp(ToReturn, SavedData[CurrentRewindFrame + 1].GetSavedQuat(VariableName, DefaultReturnValue), LerpT);
+	}
+
+	return ToReturn;
+}
+
+float UTimeComponent::LoadSavedFloat(FName VariableName, bool Interpolated, float DefaultReturnValue)
+{
+	float ToReturn = SavedData[CurrentRewindFrame].GetSavedFloat(VariableName, DefaultReturnValue);
+
+	if (Interpolated)
+	{
+		ToReturn = FMath::Lerp(ToReturn, SavedData[CurrentRewindFrame + 1].GetSavedFloat(VariableName, DefaultReturnValue), LerpT);
+	}
+
+	return ToReturn;
+}
+
+int UTimeComponent::LoadSavedInt(FName VariableName, bool Interpolated, int DefaultReturnValue)
+{
+	int ToReturn = SavedData[CurrentRewindFrame].GetSavedInt(VariableName, DefaultReturnValue);
+
+	if (Interpolated)
+	{
+		ToReturn = FMath::Lerp(ToReturn, SavedData[CurrentRewindFrame + 1].GetSavedInt(VariableName, DefaultReturnValue), LerpT);
+	}
+
+	return ToReturn;
+}
+
+bool UTimeComponent::LoadSavedBool(FName VariableName, bool DefaultReturnValue)
+{
+	return SavedData[CurrentRewindFrame].GetSavedBool(VariableName, DefaultReturnValue);
+}
+
 void UTimeComponent::PerformCleanup()
 {
-	int FramesToRemove = SavedData.Num() - FramesSincelastCleanup;
-	if (FramesToRemove > 0)
-	{
-		CleanupArray.Broadcast(FramesToRemove - 1);
-
-		UE_LOG(LogTemp, Log, TEXT("Array size before removal:  %d"), SavedData.Num());
-		SavedData.RemoveAt(0, FramesToRemove, true);
-		UE_LOG(LogTemp, Log, TEXT("Array size after removal:  %d"), SavedData.Num());
-	}
+	
+	SavedData.RemoveAt(0, SavedData.Num() - FramesSincelastCleanup, true);
+	
 	FramesSincelastCleanup = 0;
 	SecondSinceLastCleanup = 0.f;
+}
+
+int UTimeComponent::GetArrayEndIndex()
+{
+	return SavedData.Num() - 1;
 }
 
