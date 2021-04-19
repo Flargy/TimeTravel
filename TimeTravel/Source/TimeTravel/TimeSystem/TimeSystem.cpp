@@ -3,17 +3,27 @@
 #include "Kismet/GameplayStatics.h"
 #include "PhysicsEngine/PhysicsSettings.h"
 
-void TimeSystem::RegisterTimeComponent(UTimeComponent* compToAdd)
+
+/**
+ * Function for registering a TimeComponent for reversal of time
+ */
+void FTimeSystem::RegisterTimeComponent(UTimeComponent* compToAdd)
 {
 	ReverseComponents.Add(compToAdd);
 }
 
-void TimeSystem::UnregisterTimeComponent(UTimeComponent* compToRemove)
+/**
+ * Function for unregistering a TimeComponent from time reversal
+ */
+void FTimeSystem::UnregisterTimeComponent(UTimeComponent* compToRemove)
 {
 	ReverseComponents.Remove(compToRemove);
 }
 
-void TimeSystem::BeginRewind()
+/**
+ * Starts the rewind and activates BeginReverse on each registered TimeComponent
+ */
+void FTimeSystem::BeginRewind()
 {
 	IsRewinding = true;
 
@@ -26,7 +36,10 @@ void TimeSystem::BeginRewind()
 	}
 }
 
-void TimeSystem::EndRewind()
+/**
+ * Ends the rewind and activates EndReverse on each registered TimeComponent
+ */
+void FTimeSystem::EndRewind()
 {
 	if (!IsRewinding)
 		return;
@@ -38,7 +51,11 @@ void TimeSystem::EndRewind()
 	}
 }
 
-void TimeSystem::Tick(float DeltaTime)
+/**
+ * Increments TimeRewinded when rewinding and Decrements it when time isn't being rewinded.
+ * Calls ReverseTick on each registered TimeComponent each frame when rewinding
+ */
+void FTimeSystem::Tick(float DeltaTime)
 {
 	if (!IsRewinding)
 	{
@@ -59,7 +76,10 @@ void TimeSystem::Tick(float DeltaTime)
 	}
 }
 
-float TimeSystem::GetSecondsToRewind()
+/**
+ * Returns the maximum number of seconds that can be rewinded at a time
+ */
+float FTimeSystem::GetSecondsToRewind()
 {
 	return SecondsToRewind;
 }

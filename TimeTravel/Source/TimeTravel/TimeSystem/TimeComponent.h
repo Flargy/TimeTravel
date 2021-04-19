@@ -3,10 +3,11 @@
 #include "TimeData.h"
 #include "TimeComponent.generated.h"
 
+// Delegates used to activate blueprint functions
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSaveData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBeginRewind);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEndRewind, int, FrameIndex);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLoadData, int, FrameIndex, float, LerpValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndRewind);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadData);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UTimeComponent : public UActorComponent

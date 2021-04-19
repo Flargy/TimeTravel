@@ -1,10 +1,9 @@
 #pragma once
-//#include "TimeSystem.generated.h"
 
 class UTimeComponent;
 class ATimeTravelGameModeBase;
 
-class TimeSystem
+class FTimeSystem
 {
 
 public:
@@ -19,6 +18,9 @@ public:
 private:
 	TArray<UTimeComponent*> ReverseComponents;
 	bool IsRewinding = false;
+
+	// The maximum amount of seconds that can be reversed at a given time
 	float SecondsToRewind = 5.0f;
+	
 	float TimeRewinded = 0.f;
 };

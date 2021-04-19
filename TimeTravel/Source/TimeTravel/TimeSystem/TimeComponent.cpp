@@ -10,6 +10,9 @@ UTimeComponent::UTimeComponent()
 	PrimaryComponentTick.bStartWithTickEnabled = true;
 }
 
+/**
+ * Fetches and sets cashed values
+ */
 void UTimeComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -25,7 +28,9 @@ void UTimeComponent::BeginPlay()
 	
 }
 
-
+/**
+ * Collects saved data each frame and activates a clean up to delete old data when enough time has passed
+ */
 void UTimeComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -52,6 +57,9 @@ void UTimeComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FA
 
 }
 
+/**
+ * Disables the tick and physics of the attached actor and sets values for time reversal
+ */
 void UTimeComponent::BeginReverse()
 {
 	OwningActor->SetActorTickEnabled(false);
@@ -60,8 +68,12 @@ void UTimeComponent::BeginReverse()
 	
 	CurrentRewindFrame = SavedData.Num() - 1;
 	TimeInCurrentRewindFrame = 0;
+	BeginRewind.Broadcast();
 }
 
+/**
+ * Reactivates the tick and physics of the actor and applies values from the current frame
+ */
 void UTimeComponent::EndReverse()
 {
 	OwningActor->SetActorTickEnabled(true);
@@ -75,11 +87,14 @@ void UTimeComponent::EndReverse()
 	OwningActor->SetActorLocation(CurrentFrameData.Location);
 	OwningActor->SetActorRotation(CurrentFrameData.Rotation);
 	
-
+	EndRewind.Broadcast();
 	SavedData.RemoveAt(CurrentRewindFrame, SavedData.Num() - CurrentRewindFrame);
 
 }
 
+/**
+ * Lerps in between frames and applies values to the attached actor
+ */
 void UTimeComponent::ReverseTick(float DeltaTime)
 {
 	TimeInCurrentRewindFrame -= DeltaTime;
@@ -105,10 +120,11 @@ void UTimeComponent::ReverseTick(float DeltaTime)
 	FQuat NewQuat = FQuat::Slerp(CurrentFrameData.Rotation, PreviousFrameData.Rotation, LerpT);
 	OwningActor->SetActorRotation(NewQuat);
 
-	LoadData.Broadcast(CurrentRewindFrame, LerpT);
+	LoadData.Broadcast();
 	
-	//UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f Z: %f"), NewPosition.X, NewPosition.Y, NewPosition.Z);
 }
+
+#pragma region CellectionOfSaveAndLoadFunctions
 
 void UTimeComponent::SaveVector(FName VariableName, FVector Value)
 {
@@ -195,6 +211,11 @@ bool UTimeComponent::LoadSavedBool(FName VariableName, bool DefaultReturnValue)
 	return SavedData[CurrentRewindFrame].GetSavedBool(VariableName, DefaultReturnValue);
 }
 
+#pragma endregion
+
+/**
+ * Removes saved frame data from more than SecondsToRewind (base value 5) ago
+ */
 void UTimeComponent::PerformCleanup()
 {
 	
@@ -204,6 +225,9 @@ void UTimeComponent::PerformCleanup()
 	SecondSinceLastCleanup = 0.f;
 }
 
+/**
+ * Returns the last element in SavedData 
+ */
 int UTimeComponent::GetArrayEndIndex()
 {
 	return SavedData.Num() - 1;

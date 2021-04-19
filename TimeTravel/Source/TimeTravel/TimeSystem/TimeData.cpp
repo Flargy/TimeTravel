@@ -1,5 +1,6 @@
 #include "TimeData.h"
 
+#pragma region SaveFunctions
 
 void FTimeData::SaveVector(FName VariableName, FVector Value)
 {
@@ -35,6 +36,9 @@ void FTimeData::SaveBool(FName VariableName, bool Value)
 	NewVariable.SavedBool = Value;
 	SavedVariables.Add(VariableName, NewVariable);
 }
+#pragma endregion
+
+#pragma region LoadFunctions
 
 FVector FTimeData::GetSavedVector(FName VariableName, FVector DefaultReturnValue)
 {
@@ -86,3 +90,4 @@ bool FTimeData::GetSavedBool(FName VariableName, bool DefaultReturnValue)
 	}
 	return SavedVariables[VariableName].SavedBool;
 }
+#pragma endregion

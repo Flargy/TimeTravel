@@ -18,5 +18,7 @@ class TIMETRAVEL_API ATimeTravelGameModeBase : public AGameModeBase
 public:
 	ATimeTravelGameModeBase();
 	void Tick(float DeltaTime) override;
-	TimeSystem TimeSystemInstance;
+
+	// Creation of the TimeSystem instance connecting player input and TimeComponents
+	FTimeSystem TimeSystemInstance;
 };
