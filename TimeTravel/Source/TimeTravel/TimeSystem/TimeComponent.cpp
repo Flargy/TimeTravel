@@ -88,6 +88,7 @@ void UTimeComponent::EndReverse()
 	OwningActor->SetActorRotation(CurrentFrameData.Rotation);
 	
 	EndRewind.Broadcast();
+	CurrentRewindFrame++;
 	SavedData.RemoveAt(CurrentRewindFrame, SavedData.Num() - CurrentRewindFrame);
 
 }
@@ -218,11 +219,11 @@ bool UTimeComponent::LoadSavedBool(FName VariableName, bool DefaultReturnValue)
  */
 void UTimeComponent::PerformCleanup()
 {
-	
 	SavedData.RemoveAt(0, SavedData.Num() - FramesSincelastCleanup, true);
 	
 	FramesSincelastCleanup = 0;
 	SecondSinceLastCleanup = 0.f;
+
 }
 
 /**
