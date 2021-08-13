@@ -35,7 +35,7 @@ void UTimeComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-
+	// The manual C++ way of storing data, currently used for easy showcase purposes
 	FTimeData FrameData;
 	FTransform OwnerTransform = OwningActor->GetTransform();
 	FrameData.Location = OwnerTransform.GetLocation();
@@ -45,6 +45,7 @@ void UTimeComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FA
 	FrameData.AngularVelocity = PhysicsComponent->GetPhysicsAngularVelocityInRadians();
 
 	SavedData.Add(FrameData);
+	// End of C++ version
 	SaveData.Broadcast();
 
 	FramesSincelastCleanup++;
